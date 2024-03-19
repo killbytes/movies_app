@@ -1,5 +1,4 @@
 import { useState } from 'react';
-
 import { GetData } from './GetData';
 
 // eslint-disable-next-line import/no-absolute-path
