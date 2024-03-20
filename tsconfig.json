@@ -13,6 +13,12 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
+    
+    // path aliases
+    "baseUrl": ".",
+    "paths": {
+      "src/*": ["src/*"],
+    },
 
     /* Linting */
     "strict": true,

@@ -1,7 +1,5 @@
 import { useState } from 'react';
-import { GetData } from './GetData';
 
-// eslint-disable-next-line import/no-absolute-path
 import viteLogo from '/vite.svg';
 
 import reactLogo from './assets/react.svg';
@@ -14,7 +12,6 @@ function App() {
   return (
     <>
       <div>
-        <GetData />
         <a href="https://vitejs.dev" target="_blank" rel="noreferrer">
           <img src={viteLogo} className="logo" alt="Vite logo" />
         </a>

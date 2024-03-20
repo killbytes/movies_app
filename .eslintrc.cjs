@@ -3,23 +3,37 @@ module.exports = {
   env: { browser: true, es2020: true },
   extends: [
     'airbnb',
+    'airbnb-typescript',
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
+    'plugin:react/recommended',
+    'plugin:react/jsx-runtime',
     'plugin:react-hooks/recommended',
-    'plugin:prettier/recommended',
     'plugin:import/errors',
     'plugin:import/warnings',
+    'plugin:prettier/recommended',
   ],
-  ignorePatterns: ['dist', '.eslintrc.cjs'],
+  ignorePatterns: ['dev-dist', 'dist', '.eslintrc.cjs', 'vite.config.ts'],
   parserOptions: {
     ecmaVersion: 'latest',
     sourceType: 'module',
     ecmaFeatures: {
       jsx: true,
     },
+    project: './tsconfig.json',
   },
   parser: '@typescript-eslint/parser',
-  plugins: ['react-refresh', 'prettier', 'import', 'jsx-a11y'],
+  plugins: ['react-refresh', 'react', 'prettier', 'import', 'jsx-a11y'],
+  settings: {
+    'import/resolver': {
+      typescript: {
+        alwaysTryTypes: true,
+      },
+      alias: [
+        ['', './public']
+      ],
+    },
+  },
   // все правила eslint:
   // https://eslint.org/docs/latest/rules/
   rules: {
@@ -33,8 +47,7 @@ module.exports = {
         endOfLine: 'auto',
       },
     ],
-    'react/react-in-jsx-scope': 'off',
-    'react/jsx-filename-extension': ['error', { extensions: ['.jsx', '.tsx'] }],
+    //'react/jsx-filename-extension': ['error', { extensions: ['.jsx', '.tsx'] }],
     'react/destructuring-assignment': 'off',
     // 'import/extensions': [
     //   'error',
@@ -46,8 +59,9 @@ module.exports = {
     //     tsx: 'never',
     //   },
     // ],
-    'import/no-unresolved': 'off',
-    'no-shadow': 'off',
+    'import/no-absolute-path': 'off',
+    'import/extensions': 'off',
+    '@typescript-eslint/no-shadow': 'off',
     'jsx-a11y/label-has-associated-control': 'off',
     'jsx-a11y/control-has-associated-label': 'off',
     'react/sort-comp': 'off',
@@ -55,8 +69,6 @@ module.exports = {
     'react/prefer-stateless-function': 'off',
     'spaced-comment': 'off',
     'vite': 'off',
-    'import/no-extraneous-dependencies': 'off',
-    // 'import/extensions' : 'off',
     // disable semicolons - set it in prettier
     //'semi': 'off',
     // disable increment operator
@@ -83,13 +95,5 @@ module.exports = {
         'newlines-between': 'always',
       },
     ],
-  },
-  settings: {
-    'import/resolver': {
-      node: {
-        extensions: ['.js', '.jsx', '.ts', '.tsx'],
-        moduleDirectory: ['node_modules', 'src/'],
-      },
-    },
   },
 }
