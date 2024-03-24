@@ -14,7 +14,7 @@ export type TMoviePage = {
 
 function MovieList() {
   const [movies, setMovies] = useState(null as null | TMoviePage);
-  const [needToLoadMovies, setNeedToLoadMovies] = useState(true)
+  const [needToLoadMovies, setNeedToLoadMovies] = useState(true);
   const [loading, setLoading] = useState(false);
   const loadingRef = useRef(false);
 
