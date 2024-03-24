@@ -21,7 +21,6 @@ function MovieList() {
   useEffect(() => {
     if (needToLoadMovies) {
       if (!loadingRef.current) {
-        //if (!loading) {
         setNeedToLoadMovies(false);
         setLoading(true);
         loadingRef.current = true;
