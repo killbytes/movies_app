@@ -1,6 +1,6 @@
-// eslint-disable-next-line import/prefer-default-export
 export class GetData {
   private apiBase = 'https://swapi.dev/api';
+
   async getResource(url: string) {
     const res = await fetch(`${this.apiBase}${url}`, {
       headers: {
@@ -13,9 +13,11 @@ export class GetData {
     }
     return res.json();
   }
+
   async getAllPlanet() {
     return this.getResource(`/planets/`);
   }
+
   async getPlanets(id: number | string) {
     return this.getResource(`/planets/${id}/`);
   }

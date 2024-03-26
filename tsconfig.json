@@ -13,18 +13,19 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    
+
     // path aliases
     "baseUrl": ".",
     "paths": {
-      "src/*": ["src/*"],
+      "src/*": ["src/*"]
     },
 
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]
