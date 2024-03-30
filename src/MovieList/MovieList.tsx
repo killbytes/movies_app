@@ -1,9 +1,9 @@
 import React from 'react';
-import { Button, Card, Flex, Typography } from 'antd';
+import {Alert, Button, Card, Flex, Spin, Typography} from 'antd';
 
 import { getMovies } from 'src/GetData';
-
 import css from './MoviesList.module.scss';
+
 
 const cardStyle: React.CSSProperties = {
   width: 620,
@@ -30,6 +30,8 @@ export type MovieListState = {
   moviePage: null | TMoviePage;
   needToLoadMovies: boolean;
   isLoading: boolean;
+  isError: boolean;
+  error: any;
 };
 
 class MovieList extends React.Component<MovieListProps, MovieListState> {
@@ -41,6 +43,8 @@ class MovieList extends React.Component<MovieListProps, MovieListState> {
       moviePage: null,
       needToLoadMovies: true,
       isLoading: false,
+      isError: false,
+      error: null,
     };
   }
 
@@ -64,14 +68,25 @@ class MovieList extends React.Component<MovieListProps, MovieListState> {
     if (this.state.needToLoadMovies) {
       this.setState((prevState) => ({ ...prevState, needToLoadMovies: false }));
       if (!this.isloading) {
-        this.setState((prevState) => ({ ...prevState, isLoading: true }));
+        this.setState((prevState) => ({
+          ...prevState,
+          isLoading: true,
+          isError: false,
+          error: null,
+        }));
         this.isloading = true;
+
         (async () => {
           try {
             const moviePage = await getMovies('return');
             this.setState((prevState) => ({ ...prevState, moviePage }));
           } catch (ex) {
             console.error('error fetching movies', ex);
+            this.setState((prevState) => ({
+              ...prevState,
+              isError: true,
+              error: ex,
+            }));
           } finally {
             this.setState((prevState) => ({ ...prevState, isLoading: false }));
             this.isloading = false;
@@ -82,14 +97,20 @@ class MovieList extends React.Component<MovieListProps, MovieListState> {
   };
 
   override render() {
-    const { moviePage, isLoading } = this.state;
+    const { moviePage, isLoading, isError, error } = this.state;
+    console.log("err", error?.message);
     return (
       <div className={css.page}>
         <div>movies list</div>
         <button type="button" onClick={() => this.setState((prevState) => ({ ...prevState, needToLoadMovies: true }))}>
           reload list
         </button>
-        <div>loading: {`${isLoading}`}</div>
+        {
+          isLoading && <Spin/>
+        }
+        {
+          isError && <Alert type="error" message={JSON.stringify(error)} />
+        }
         <div className="cards">
           {moviePage?.results.map((movie) => {
             return (
