@@ -53,12 +53,6 @@ class MovieList extends React.Component<MovieListProps, MovieListState> {
   }
 
   override componentDidUpdate(prevProps: Readonly<MovieListProps>, prevState: Readonly<MovieListState>) {
-    console.log(
-      'prevState.needToLoadMovies',
-      prevState.needToLoadMovies,
-      'this.state.needToLoadMovies',
-      this.state.needToLoadMovies
-    );
     if (prevState.needToLoadMovies !== this.state.needToLoadMovies) {
       this.loadMovies();
     }
@@ -98,19 +92,20 @@ class MovieList extends React.Component<MovieListProps, MovieListState> {
 
   override render() {
     const { moviePage, isLoading, isError, error } = this.state;
-    console.log("err", error?.message);
+
     return (
       <div className={css.page}>
         <div>movies list</div>
         <button type="button" onClick={() => this.setState((prevState) => ({ ...prevState, needToLoadMovies: true }))}>
           reload list
         </button>
-        {
-          isLoading && <Spin/>
-        }
-        {
-          isError && <Alert type="error" message={JSON.stringify(error)} />
-        }
+        {isLoading && <Spin />}
+        {isError &&
+          (function () {
+            if (['Failed to fetch', 'Network error'].includes(error.message))
+              return <Alert type="error" message="Ошибка соединения с сервером, возможно проблема с интернетом" />;
+            return <Alert type="error" message={`Неизвестная ошибка: ${error.message}`} />;
+          })()}
         <div className="cards">
           {moviePage?.results.map((movie) => {
             return (
