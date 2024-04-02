@@ -1,17 +1,20 @@
 import React from 'react';
-import {Alert, Button, Card, Flex, Spin, Typography} from 'antd';
+import { Alert, Button, Card, Flex, Spin, Typography } from 'antd';
 
 import { getMovies } from 'src/GetData';
-import css from './MoviesList.module.scss';
 
+import css from './MoviesList.module.scss';
+import SkeletImg from './assets/t6-k1xjf49Q.jpg';
 
 const cardStyle: React.CSSProperties = {
-  width: 620,
+  width: 450,
+  borderRadius: 8,
 };
 
 const imgStyle: React.CSSProperties = {
-  display: 'block',
-  width: 273,
+  display: 'flex',
+  width: 180,
+  height: 280,
 };
 
 export type TMovie = {
@@ -32,6 +35,15 @@ export type MovieListState = {
   isLoading: boolean;
   isError: boolean;
   error: any;
+};
+
+// Функция для сокращения текста
+const truncateText = (text: string, maxLength: number) => {
+  if (text.length <= maxLength) {
+    return text;
+  }
+  const truncatedText = text.substr(0, text.lastIndexOf(' ', maxLength));
+  return `${truncatedText}...`;
 };
 
 class MovieList extends React.Component<MovieListProps, MovieListState> {
@@ -89,6 +101,7 @@ class MovieList extends React.Component<MovieListProps, MovieListState> {
       }
     }
   };
+  // private src: any;
 
   override render() {
     const { moviePage, isLoading, isError, error } = this.state;
@@ -106,25 +119,33 @@ class MovieList extends React.Component<MovieListProps, MovieListState> {
               return <Alert type="error" message="Ошибка соединения с сервером, возможно проблема с интернетом" />;
             return <Alert type="error" message={`Неизвестная ошибка: ${error.message}`} />;
           })()}
-        <div className="cards">
+
+        <Flex className={css.cards} gap="middle" wrap="wrap">
           {moviePage?.results.map((movie) => {
             return (
               // <div key={movie.id}>{JSON.stringify(movie)}</div>
-              <Card key={movie.id} hoverable style={cardStyle} styles={{ body: { padding: 0, overflow: 'hidden' } }}>
+              <Card
+                size="small"
+                key={movie.id}
+                hoverable
+                style={cardStyle}
+                styles={{ body: { padding: 0, overflow: 'hidden' } }}
+              >
                 <Flex justify="space-between">
                   <img
                     alt="avatar"
-                    src={`https://image.tmdb.org/t/p/original${JSON.stringify(movie.poster_path).replace(
-                      /^['"](.*)['"]$/,
-                      '$1'
-                    )}`}
+                    {movie.poster_path}
+                    { movie.poster_path ?
+                      src = `https://image.tmdb.org/t/p/original${JSON.stringify(movie.poster_path).replace(/^['"](.*)['"]$/, '$1')}` :
+                      src = {SkeletImg}
+                    }
                     style={imgStyle}
                   />
 
-                  <Flex vertical align="flex-end" justify="space-between" style={{ padding: 32 }}>
+                  <Flex vertical align="flex-start" justify="space-between" style={{ padding: 20, paddingTop: 7 }}>
                     <Typography.Title level={3}>{JSON.stringify(movie.title)}</Typography.Title>
 
-                    <Typography.Title level={4}>{JSON.stringify(movie.overview)}</Typography.Title>
+                    <Typography.Title level={4}>{truncateText(JSON.stringify(movie.overview), 100)}</Typography.Title>
                     <Button type="primary" href="https://ant.design" target="_blank">
                       Get Started
                     </Button>
@@ -133,11 +154,12 @@ class MovieList extends React.Component<MovieListProps, MovieListState> {
               </Card>
             );
           })}
-        </div>
+        </Flex>
       </div>
     );
   }
 }
+
 export default MovieList;
 
 /*
