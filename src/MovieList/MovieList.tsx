@@ -2,9 +2,9 @@ import React from 'react';
 import { Alert, Button, Card, Flex, Spin, Typography } from 'antd';
 
 import { getMovies } from 'src/GetData';
+import SkeletImg from 'src/assets/t6-k1xjf49Q.jpg';
 
 import css from './MoviesList.module.scss';
-import SkeletImg from './assets/t6-k1xjf49Q.jpg';
 
 const cardStyle: React.CSSProperties = {
   width: 450,
@@ -134,10 +134,10 @@ class MovieList extends React.Component<MovieListProps, MovieListState> {
                 <Flex justify="space-between">
                   <img
                     alt="avatar"
-                    {movie.poster_path}
-                    { movie.poster_path ?
-                      src = `https://image.tmdb.org/t/p/original${JSON.stringify(movie.poster_path).replace(/^['"](.*)['"]$/, '$1')}` :
-                      src = {SkeletImg}
+                    src={
+                      movie.poster_path
+                        ? `https://image.tmdb.org/t/p/original${JSON.stringify(movie.poster_path).replace(/^['"](.*)['"]$/, '$1')}`
+                        : SkeletImg
                     }
                     style={imgStyle}
                   />
