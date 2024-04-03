@@ -1,4 +1,46 @@
 
+.cards {
+  max-width: 1010px;
+  gap: 36px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+}
+
+.cardInfoTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.rating {
+
+}
+
+.date {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.genres {
+  display: inline-flex;
+  gap: 8px;
+
+  .genre {
+    color: rgba(0, 0, 0, 0.88);
+    font-size: 12px;
+    line-height: 20px;
+  }
+}
+
+.descriprions {
+
+}
 
 .page {
   width: 100%;
@@ -7,4 +49,8 @@
   display: flex;
   flex-flow: column nowrap;
   gap: 10px;
+}
+
+.cardTitle {
+
 }

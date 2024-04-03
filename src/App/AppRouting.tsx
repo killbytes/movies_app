@@ -10,7 +10,7 @@ const rootRoutes: RouteObject[] = [
   },
   {
     path: 'movies',
-    Component: MovieList,
+    Component: MovieList as any,
   },
   {
     path: '*',
