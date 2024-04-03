@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert, Button, Card, Flex, Spin, Typography } from 'antd';
+import { Alert, Card, Flex, Spin } from 'antd';
 
 import { getMovies } from 'src/GetData';
 import SkeletImg from 'src/assets/t6-k1xjf49Q.jpg';
@@ -108,7 +108,6 @@ class MovieList extends React.Component<MovieListProps, MovieListState> {
 
     return (
       <div className={css.page}>
-        <div>movies list</div>
         <button type="button" onClick={() => this.setState((prevState) => ({ ...prevState, needToLoadMovies: true }))}>
           reload list
         </button>
@@ -142,13 +141,17 @@ class MovieList extends React.Component<MovieListProps, MovieListState> {
                     style={imgStyle}
                   />
 
-                  <Flex vertical align="flex-start" justify="space-between" style={{ padding: 20, paddingTop: 7 }}>
-                    <Typography.Title level={3}>{JSON.stringify(movie.title)}</Typography.Title>
-
-                    <Typography.Title level={4}>{truncateText(JSON.stringify(movie.overview), 100)}</Typography.Title>
-                    <Button type="primary" href="https://ant.design" target="_blank">
-                      Get Started
-                    </Button>
+                  <Flex vertical align="flex-start" justify="space-between" style={{ padding: 20, paddingTop: 7, justifyContent: undefined }}>
+                    <div className={css.cardInfoTop}>
+                      <h5 className={css.title}>{JSON.stringify(movie.title).replace(/^['"](.*)['"]$/, '$1')}</h5>
+                      <div className={css.rating}>5</div>
+                    </div>
+                    <time className={css.date}>2024</time>
+                    <div className={css.genres}>
+                      <div className={css.genre}>Action</div>
+                      <div className={css.genre}>Drama</div>
+                    </div>
+                    <div className={css.descriprions}>{truncateText(JSON.stringify(movie.overview), 100)}</div>
                   </Flex>
                 </Flex>
               </Card>
