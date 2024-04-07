@@ -1,5 +1,5 @@
 import React from 'react';
-import {Alert, Card, Flex, Input, Spin} from 'antd';
+import {Alert, Card, Flex, Input, Pagination, Spin} from 'antd';
 import _ from "lodash";
 
 import {getMovies} from 'src/api/GetData';
@@ -27,6 +27,7 @@ export type TMovie = {
 export type TMoviePage = {
   page: number;
   results: TMovie[];
+  total_results: number;
 };
 
 export type MovieListProps = object;
@@ -36,7 +37,8 @@ export type MovieListState = {
   isLoading: boolean;
   isError: boolean;
   error: any;
-  inputSearchText: string
+  inputSearchText: string,
+  page: number
 };
 // search: string | null | Array<number|string>
 
@@ -60,7 +62,8 @@ class MovieList extends React.Component<MovieListProps, MovieListState> {
       isLoading: false,
       isError: false,
       error: null,
-      inputSearchText: ''
+      inputSearchText: '',
+      page: 1
     };
   }
 
@@ -71,6 +74,13 @@ class MovieList extends React.Component<MovieListProps, MovieListState> {
   override componentDidUpdate(prevProps: Readonly<MovieListProps>, prevState: Readonly<MovieListState>) {
     if (prevState.inputSearchText !== this.state.inputSearchText) {
       this.typeSearch();
+    }
+    if (prevState.page !== this.state.page) {
+      this.setState(
+        {
+          needToLoadMovies: true,
+        }
+      )
     }
 
     if (prevState.needToLoadMovies !== this.state.needToLoadMovies) {
@@ -93,7 +103,7 @@ class MovieList extends React.Component<MovieListProps, MovieListState> {
 
         (async () => {
           try {
-            const moviePage = await getMovies(this.state.inputSearchText);
+            const moviePage = await getMovies(this.state.inputSearchText, this.state.page);
             this.setState((prevState) => ({...prevState, moviePage}));
           } catch (ex) {
             console.error('error fetching movies', ex);
@@ -111,13 +121,12 @@ class MovieList extends React.Component<MovieListProps, MovieListState> {
     }
   };
 
-  typeSearch = () => {
-    _.debounce(() => this.setState(
-      {
-        needToLoadMovies: true,
-      }
-    ), 350);
-  }
+  typeSearch = _.debounce(() => this.setState(
+    {
+      needToLoadMovies: true,
+    }
+  ), 350);
+
 
   override render() {
     const {moviePage, isLoading, isError, error} = this.state;
@@ -148,45 +157,61 @@ class MovieList extends React.Component<MovieListProps, MovieListState> {
           })()}
 
         <Flex className={css.cards} gap="middle" wrap="wrap">
-          {moviePage?.results.map((movie) => {
-            return (
-              // <div key={movie.id}>{JSON.stringify(movie)}</div>
-              <Card
-                size="small"
-                key={movie.id}
-                hoverable
-                style={cardStyle}
-                styles={{body: {padding: 0, overflow: 'hidden'}}}
-              >
-                <Flex justify="space-between">
-                  <img
-                    alt="avatar"
-                    src={
-                      movie.poster_path
-                        ? `https://image.tmdb.org/t/p/original${movie.poster_path}`
-                        : SkeletImg
-                    }
-                    style={imgStyle}
-                  />
+          {(function () {
+            if (moviePage && !isLoading) {
+              if (moviePage.total_results) return moviePage.results.map((movie) => {
+                return (
+                  // <div key={movie.id}>{JSON.stringify(movie)}</div>
+                  <Card
+                    size="small"
+                    key={movie.id}
+                    hoverable
+                    style={cardStyle}
+                    styles={{body: {padding: 0, overflow: 'hidden'}}}
+                  >
+                    <Flex justify="space-between">
+                      <img
+                        alt="avatar"
+                        src={
+                          movie.poster_path
+                            ? `https://image.tmdb.org/t/p/original${movie.poster_path}`
+                            : SkeletImg
+                        }
+                        style={imgStyle}
+                      />
 
-                  <Flex vertical align="flex-start" justify="space-between"
-                        style={{padding: 20, paddingTop: 7, justifyContent: undefined}}>
-                    <div className={css.cardInfoTop}>
-                      <h5 className={css.title}>{movie.title}</h5>
-                      <div className={css.rating}>5</div>
-                    </div>
-                    <time className={css.date}>2024</time>
-                    <div className={css.genres}>
-                      <div className={css.genre}>Action</div>
-                      <div className={css.genre}>Drama</div>
-                    </div>
-                    <div className={css.descriprions}>{truncateText(movie.overview, 100)}</div>
-                  </Flex>
-                </Flex>
-              </Card>
-            );
-          })}
+                      <Flex vertical align="flex-start" justify="space-between"
+                            style={{padding: 20, paddingTop: 7, justifyContent: undefined}}>
+                        <div className={css.cardInfoTop}>
+                          <h5 className={css.title}>{movie.title}</h5>
+                          <div className={css.rating}>5</div>
+                        </div>
+                        <time className={css.date}>2024</time>
+                        <div className={css.genres}>
+                          <div className={css.genre}>Action</div>
+                          <div className={css.genre}>Drama</div>
+                        </div>
+                        <div className={css.descriprions}>{truncateText(movie.overview, 100)}</div>
+                      </Flex>
+                    </Flex>
+                  </Card>
+                );
+              })
+              else {
+                return "Не найдено";
+              }
+            }
+          })()
+          }
         </Flex>
+        {
+          this.state.moviePage && <Pagination
+            current={this.state.page}
+            pageSize={20}
+            total={this.state.moviePage.total_results}
+            onChange={(page: number) => this.setState({page})}
+          />
+        }
       </div>
     );
   }

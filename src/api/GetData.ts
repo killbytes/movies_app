@@ -37,6 +37,12 @@ async function getResource(url: string) {
   return res.json();
 }
 
-export async function getMovies(query: string) {
-  return getResource(`movie?query=${query}&include_adult=false&language=en-US&page=1`);
+export async function getMovies(query: string, page: number) {
+  const searchParams = new URLSearchParams({
+    includeAdult: 'false',
+    language: 'en-US',
+    query: query,
+    page: `${page}`,
+  })
+  return getResource(`movie?${searchParams.toString()}`);
 }
