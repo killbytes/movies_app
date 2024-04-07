@@ -4,7 +4,7 @@ import { Alert, Card, Flex, Spin } from 'antd';
 import { getMovies } from 'src/GetData';
 import SkeletImg from 'src/assets/t6-k1xjf49Q.jpg';
 
-import css from './MoviesList.module.scss';
+import css from 'src/pages/MovieList/MoviesList.module.scss';
 
 const cardStyle: React.CSSProperties = {
   width: 450,

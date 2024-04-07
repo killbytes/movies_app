@@ -1,7 +1,7 @@
 import { createBrowserRouter, Navigate, RouteObject, RouterProvider } from 'react-router-dom';
 
-import MovieList from 'src/MovieList/MovieList';
-import Planet from 'src/Planet/Planet';
+import MovieList from 'src/pages/MovieList/MovieList';
+import Planet from 'src/pages/Planet/Planet';
 
 const rootRoutes: RouteObject[] = [
   {

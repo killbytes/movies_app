@@ -1,4 +1,4 @@
-import AppRouting from 'src/App/AppRouting';
+import AppRouting from 'src/pages/App/AppRouting';
 
 function App() {
   return <AppRouting />;
