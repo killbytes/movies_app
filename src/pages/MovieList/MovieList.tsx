@@ -1,7 +1,8 @@
 import React from 'react';
-import { Alert, Card, Flex, Spin } from 'antd';
+import { Alert, Card, Flex, Spin, Input } from 'antd';
+import _ from "lodash";
 
-import { getMovies } from 'src/GetData';
+import { getMovies } from 'src/api/GetData';
 import SkeletImg from 'src/assets/t6-k1xjf49Q.jpg';
 
 import css from 'src/pages/MovieList/MoviesList.module.scss';
@@ -35,7 +36,9 @@ export type MovieListState = {
   isLoading: boolean;
   isError: boolean;
   error: any;
+  search: string
 };
+// search: string | null | Array<number|string>
 
 // Функция для сокращения текста
 const truncateText = (text: string, maxLength: number) => {
@@ -57,6 +60,7 @@ class MovieList extends React.Component<MovieListProps, MovieListState> {
       isLoading: false,
       isError: false,
       error: null,
+      search: ''
     };
   }
 
@@ -84,7 +88,7 @@ class MovieList extends React.Component<MovieListProps, MovieListState> {
 
         (async () => {
           try {
-            const moviePage = await getMovies('return');
+            const moviePage = await getMovies(this.state.search);
             this.setState((prevState) => ({ ...prevState, moviePage }));
           } catch (ex) {
             console.error('error fetching movies', ex);
@@ -101,13 +105,27 @@ class MovieList extends React.Component<MovieListProps, MovieListState> {
       }
     }
   };
-  // private src: any;
+
+  typeSearch = (text: string) => {
+    _.debounce( () => this.setState(
+      prevState => ({
+        ...prevState, needToLoadMovies: true, search: text
+      })
+    ), 350);
+  }
 
   override render() {
     const { moviePage, isLoading, isError, error } = this.state;
 
     return (
       <div className={css.page}>
+
+        <Input
+          value = {this.state.search}
+          onChange = {ev => this.typeSearch(ev.currentTarget.value)}
+          placeholder="Type to search..."
+        />
+
         <button type="button" onClick={() => this.setState((prevState) => ({ ...prevState, needToLoadMovies: true }))}>
           reload list
         </button>
@@ -135,7 +153,7 @@ class MovieList extends React.Component<MovieListProps, MovieListState> {
                     alt="avatar"
                     src={
                       movie.poster_path
-                        ? `https://image.tmdb.org/t/p/original${JSON.stringify(movie.poster_path).replace(/^['"](.*)['"]$/, '$1')}`
+                        ? `https://image.tmdb.org/t/p/original${movie.poster_path}`
                         : SkeletImg
                     }
                     style={imgStyle}
@@ -143,7 +161,7 @@ class MovieList extends React.Component<MovieListProps, MovieListState> {
 
                   <Flex vertical align="flex-start" justify="space-between" style={{ padding: 20, paddingTop: 7, justifyContent: undefined }}>
                     <div className={css.cardInfoTop}>
-                      <h5 className={css.title}>{JSON.stringify(movie.title).replace(/^['"](.*)['"]$/, '$1')}</h5>
+                      <h5 className={css.title}>{movie.title}</h5>
                       <div className={css.rating}>5</div>
                     </div>
                     <time className={css.date}>2024</time>
@@ -151,7 +169,7 @@ class MovieList extends React.Component<MovieListProps, MovieListState> {
                       <div className={css.genre}>Action</div>
                       <div className={css.genre}>Drama</div>
                     </div>
-                    <div className={css.descriprions}>{truncateText(JSON.stringify(movie.overview), 100)}</div>
+                    <div className={css.descriprions}>{truncateText(movie.overview, 100)}</div>
                   </Flex>
                 </Flex>
               </Card>
