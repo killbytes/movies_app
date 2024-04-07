@@ -1,6 +1,8 @@
 import React from 'react';
-import {Card, Flex } from 'antd';
+import { Card, Flex } from 'antd';
+
 import SkeletImg from 'src/assets/t6-k1xjf49Q.jpg';
+
 import css from './MovieCard.module.scss';
 
 const cardStyle: React.CSSProperties = {
@@ -22,7 +24,7 @@ export type TMovie = {
 };
 
 export type MovieCardProps = {
-  movie: TMovie
+  movie: TMovie;
 };
 export type MovieCardState = object;
 // search: string | null | Array<number|string>
@@ -37,9 +39,8 @@ const truncateText = (text: string, maxLength: number) => {
 };
 
 class MovieCard extends React.Component<MovieCardProps, MovieCardState> {
-
   override render() {
-    const {movie} = this.props;
+    const { movie } = this.props;
 
     return (
       <Card
@@ -47,21 +48,21 @@ class MovieCard extends React.Component<MovieCardProps, MovieCardState> {
         key={movie.id}
         hoverable
         style={cardStyle}
-        styles={{body: {padding: 0, overflow: 'hidden'}}}
+        styles={{ body: { padding: 0, overflow: 'hidden' } }}
       >
         <Flex justify="space-between">
           <img
             alt="avatar"
-            src={
-              movie.poster_path
-                ? `https://image.tmdb.org/t/p/original${movie.poster_path}`
-                : SkeletImg
-            }
+            src={movie.poster_path ? `https://image.tmdb.org/t/p/original${movie.poster_path}` : SkeletImg}
             style={imgStyle}
           />
 
-          <Flex vertical align="flex-start" justify="space-between"
-                style={{padding: 20, paddingTop: 7, justifyContent: undefined}}>
+          <Flex
+            vertical
+            align="flex-start"
+            justify="space-between"
+            style={{ padding: 20, paddingTop: 7, justifyContent: undefined }}
+          >
             <div className={css.cardInfoTop}>
               <h5 className={css.title}>{movie.title}</h5>
               <div className={css.rating}>5</div>
@@ -75,8 +76,7 @@ class MovieCard extends React.Component<MovieCardProps, MovieCardState> {
           </Flex>
         </Flex>
       </Card>
-    )
-      ;
+    );
   }
 }
 

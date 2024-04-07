@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate, RouteObject, RouterProvider } from 'react-router-dom';
+
 import Planet from 'src/pages/Planet/Planet';
-import MoviePage from "src/pages/MoviePage/MoviePage";
+import MoviePage from 'src/pages/MoviePage/MoviePage';
 
 const rootRoutes: RouteObject[] = [
   {

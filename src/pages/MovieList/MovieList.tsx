@@ -1,10 +1,9 @@
 import React from 'react';
-import {Alert, Card, Flex, Input, Pagination, Spin, Tabs} from 'antd';
-import _ from "lodash";
+import { Alert, Card, Flex, Input, Pagination, Spin, Tabs } from 'antd';
+import _ from 'lodash';
 
-import {createGuestSession, getMovies} from 'src/api/GetData';
+import { createGuestSession, getMovies } from 'src/api/GetData';
 import SkeletImg from 'src/assets/t6-k1xjf49Q.jpg';
-
 import css from 'src/pages/MovieList/MoviesList.module.scss';
 
 const cardStyle: React.CSSProperties = {
@@ -37,9 +36,9 @@ export type MovieListState = {
   isLoading: boolean;
   isError: boolean;
   error: any;
-  inputSearchText: string,
-  page: number,
-  isInited: boolean
+  inputSearchText: string;
+  page: number;
+  isInited: boolean;
 };
 // search: string | null | Array<number|string>
 
@@ -65,21 +64,25 @@ class MovieList extends React.Component<MovieListProps, MovieListState> {
       error: null,
       inputSearchText: '',
       page: 1,
-      isInited: false
+      isInited: false,
     };
   }
 
   override componentDidMount() {
-    createGuestSession().catch(err => {
-      console.error('error fetching movies', err);
-      this.setState((prevState) => ({
-        ...prevState,
-        isError: true,
-        error: err,
-      }));
-    }).finally(() => this.setState({
-      isInited: true
-    }));
+    createGuestSession()
+      .catch((err) => {
+        console.error('error fetching movies', err);
+        this.setState((prevState) => ({
+          ...prevState,
+          isError: true,
+          error: err,
+        }));
+      })
+      .finally(() =>
+        this.setState({
+          isInited: true,
+        })
+      );
     this.loadMovies();
   }
 
@@ -88,22 +91,19 @@ class MovieList extends React.Component<MovieListProps, MovieListState> {
       this.typeSearch();
     }
     if (prevState.page !== this.state.page) {
-      this.setState(
-        {
-          needToLoadMovies: true,
-        }
-      )
+      this.setState({
+        needToLoadMovies: true,
+      });
     }
 
     if (prevState.needToLoadMovies !== this.state.needToLoadMovies) {
       this.loadMovies();
     }
-
   }
 
   loadMovies = () => {
     if (this.state.needToLoadMovies) {
-      this.setState((prevState) => ({...prevState, needToLoadMovies: false}));
+      this.setState((prevState) => ({ ...prevState, needToLoadMovies: false }));
       if (!this.isloading) {
         this.setState((prevState) => ({
           ...prevState,
@@ -116,7 +116,7 @@ class MovieList extends React.Component<MovieListProps, MovieListState> {
         (async () => {
           try {
             const moviePage = await getMovies(this.state.inputSearchText, this.state.page);
-            this.setState((prevState) => ({...prevState, moviePage}));
+            this.setState((prevState) => ({ ...prevState, moviePage }));
           } catch (ex) {
             console.error('error fetching movies', ex);
             this.setState((prevState) => ({
@@ -125,7 +125,7 @@ class MovieList extends React.Component<MovieListProps, MovieListState> {
               error: ex,
             }));
           } finally {
-            this.setState((prevState) => ({...prevState, isLoading: false}));
+            this.setState((prevState) => ({ ...prevState, isLoading: false }));
             this.isloading = false;
           }
         })();
@@ -133,164 +133,132 @@ class MovieList extends React.Component<MovieListProps, MovieListState> {
     }
   };
 
-  typeSearch = _.debounce(() => this.setState(
-    {
-      needToLoadMovies: true,
-    }
-  ), 350);
-
+  typeSearch = _.debounce(
+    () =>
+      this.setState({
+        needToLoadMovies: true,
+      }),
+    350
+  );
 
   override render() {
-    const {moviePage, isLoading, isError, error, isInited} = this.state;
+    const { moviePage, isLoading, isError, error, isInited } = this.state;
 
     return (
-      <>
-        <Tabs
-          defaultActiveKey="1"
-          centered
-          items={[
-            {
-              key: 'Search',
-              label: `Search`,
-              children:
+      <Tabs
+        defaultActiveKey="1"
+        centered
+        items={[
+          {
+            key: 'Search',
+            label: `Search`,
+            children: (
               <>
-
-                {!isInited && <Spin/>}
-                {isInited && <div className={css.page}>
-                  <Input
-                    value={this.state.inputSearchText}
-                    onChange={ev => this.setState(
-                      {
-                        inputSearchText: ev.currentTarget.value
-                      }
-                    )}
-                    // this.typeSearch()
-                    placeholder="Type to search..."
-                  />
-
-                  <button type="button" onClick={() => this.setState((prevState) => ({...prevState, needToLoadMovies: true}))}>
-                    reload list
-                  </button>
-                  {isLoading && <Spin/>}
-                  {isError &&
-                    (function () {
-                      if (['Failed to fetch', 'Network error'].includes(error.message))
-                        return <Alert type="error" message="Ошибка соединения с сервером, возможно проблема с интернетом"/>;
-                      return <Alert type="error" message={`Неизвестная ошибка: ${error.message}`}/>;
-                    })()}
-                  <Flex className={css.cards} gap="middle" wrap="wrap">
-                    {(function () {
-                      if (moviePage && !isLoading) {
-                        if (moviePage.total_results) return moviePage.results.map((movie) => {
-                          return (
-                            // <div key={movie.id}>{JSON.stringify(movie)}</div>
-                            <Card
-                              size="small"
-                              key={movie.id}
-                              hoverable
-                              style={cardStyle}
-                              styles={{body: {padding: 0, overflow: 'hidden'}}}
-                            >
-                              <Flex justify="space-between">
-                                <img
-                                  alt="avatar"
-                                  src={
-                                    movie.poster_path
-                                      ? `https://image.tmdb.org/t/p/original${movie.poster_path}`
-                                      : SkeletImg
-                                  }
-                                  style={imgStyle}
-                                />
-
-                                <Flex vertical align="flex-start" justify="space-between"
-                                      style={{padding: 20, paddingTop: 7, justifyContent: undefined}}>
-                                  <div className={css.cardInfoTop}>
-                                    <h5 className={css.title}>{movie.title}</h5>
-                                    <div className={css.rating}>5</div>
-                                  </div>
-                                  <time className={css.date}>2024</time>
-                                  <div className={css.genres}>
-                                    <div className={css.genre}>Action</div>
-                                    <div className={css.genre}>Drama</div>
-                                  </div>
-                                  <div className={css.descriprions}>{truncateText(movie.overview, 100)}</div>
-                                </Flex>
-                              </Flex>
-                            </Card>
-                          );
+                {!isInited && <Spin />}
+                {isInited && (
+                  <div className={css.page}>
+                    <Input
+                      value={this.state.inputSearchText}
+                      onChange={(ev) =>
+                        this.setState({
+                          inputSearchText: ev.currentTarget.value,
                         })
-                        else {
-                          return "Не найдено";
-                        }
                       }
-                    })()
-                    }
-                  </Flex>
-                  {
-                    this.state.moviePage && <Pagination
-                      current={this.state.page}
-                      pageSize={20}
-                      total={this.state.moviePage.total_results}
-                      onChange={(page: number) => this.setState({page})}
+                      // this.typeSearch()
+                      placeholder="Type to search..."
                     />
-                  }
-                </div>}
+
+                    <button
+                      type="button"
+                      onClick={() => this.setState((prevState) => ({ ...prevState, needToLoadMovies: true }))}
+                    >
+                      reload list
+                    </button>
+                    {isLoading && <Spin />}
+                    {isError &&
+                      (function () {
+                        if (['Failed to fetch', 'Network error'].includes(error.message))
+                          return (
+                            <Alert
+                              type="error"
+                              message="Ошибка соединения с сервером, возможно проблема с интернетом"
+                            />
+                          );
+                        return <Alert type="error" message={`Неизвестная ошибка: ${error.message}`} />;
+                      })()}
+                    <Flex className={css.cards} gap="middle" wrap="wrap">
+                      {(function () {
+                        if (moviePage && !isLoading) {
+                          if (moviePage.total_results)
+                            return moviePage.results.map((movie) => {
+                              return (
+                                // <div key={movie.id}>{JSON.stringify(movie)}</div>
+                                <Card
+                                  size="small"
+                                  key={movie.id}
+                                  hoverable
+                                  style={cardStyle}
+                                  styles={{ body: { padding: 0, overflow: 'hidden' } }}
+                                >
+                                  <Flex justify="space-between">
+                                    <img
+                                      alt="avatar"
+                                      src={
+                                        movie.poster_path
+                                          ? `https://image.tmdb.org/t/p/original${movie.poster_path}`
+                                          : SkeletImg
+                                      }
+                                      style={imgStyle}
+                                    />
+
+                                    <Flex
+                                      vertical
+                                      align="flex-start"
+                                      justify="space-between"
+                                      style={{ padding: 20, paddingTop: 7, justifyContent: undefined }}
+                                    >
+                                      <div className={css.cardInfoTop}>
+                                        <h5 className={css.title}>{movie.title}</h5>
+                                        <div className={css.rating}>5</div>
+                                      </div>
+                                      <time className={css.date}>2024</time>
+                                      <div className={css.genres}>
+                                        <div className={css.genre}>Action</div>
+                                        <div className={css.genre}>Drama</div>
+                                      </div>
+                                      <div className={css.descriprions}>{truncateText(movie.overview, 100)}</div>
+                                    </Flex>
+                                  </Flex>
+                                </Card>
+                              );
+                            });
+
+                          return 'Не найдено';
+                        }
+                      })()}
+                    </Flex>
+                    {this.state.moviePage && (
+                      <Pagination
+                        current={this.state.page}
+                        pageSize={20}
+                        total={this.state.moviePage.total_results}
+                        onChange={(page: number) => this.setState({ page })}
+                      />
+                    )}
+                  </div>
+                )}
               </>
-            },
-            {
-              key: 'Rated',
-              label: `Rated`,
-              children: 'Rated tab'
-            }
-          ]
-          }
-        />
-      </>
-    )
-      ;
+            ),
+          },
+          {
+            key: 'Rated',
+            label: `Rated`,
+            children: 'Rated tab',
+          },
+        ]}
+      />
+    );
   }
 }
 
 export default MovieList;
-
-/*
-export function MovieListFun() {
-  const [moviePage, setMoviePage] = useState(null as null | TMoviePage);
-  const [needToLoadMovies, setNeedToLoadMovies] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
-  const isLoadingRef = useRef(false);
-
-  useEffect(() => {
-    if (needToLoadMovies) {
-      setNeedToLoadMovies(false);
-      if (!isLoadingRef.current) {
-        setIsLoading(true);
-        isLoadingRef.current = true;
-
-        (async () => {
-          try {
-            const movies = await getMovies('return');
-            setMoviePage(movies);
-          } catch (ex) {
-            console.error('error fetching movies', ex);
-          } finally {
-            setIsLoading(false);
-            isLoadingRef.current = false;
-          }
-        })();
-      }
-    }
-  }, [needToLoadMovies]);
-
-  return (
-    <div className={css.page}>
-      <div>movies list</div>
-      <button type="button" onClick={() => setNeedToLoadMovies(true)}>
-        reload list
-      </button>
-      <div>loading: {`${isLoading}`}</div>
-      {moviePage?.results.map((movie) => <div key={movie.id}>{JSON.stringify(movie)}</div>)}
-    </div>
-  );
-}
-*/
