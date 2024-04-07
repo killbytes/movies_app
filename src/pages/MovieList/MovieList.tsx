@@ -1,8 +1,8 @@
 import React from 'react';
-import { Alert, Card, Flex, Spin, Input } from 'antd';
+import {Alert, Card, Flex, Input, Spin} from 'antd';
 import _ from "lodash";
 
-import { getMovies } from 'src/api/GetData';
+import {getMovies} from 'src/api/GetData';
 import SkeletImg from 'src/assets/t6-k1xjf49Q.jpg';
 
 import css from 'src/pages/MovieList/MoviesList.module.scss';
@@ -36,7 +36,7 @@ export type MovieListState = {
   isLoading: boolean;
   isError: boolean;
   error: any;
-  search: string
+  inputSearchText: string
 };
 // search: string | null | Array<number|string>
 
@@ -60,7 +60,7 @@ class MovieList extends React.Component<MovieListProps, MovieListState> {
       isLoading: false,
       isError: false,
       error: null,
-      search: ''
+      inputSearchText: ''
     };
   }
 
@@ -69,14 +69,19 @@ class MovieList extends React.Component<MovieListProps, MovieListState> {
   }
 
   override componentDidUpdate(prevProps: Readonly<MovieListProps>, prevState: Readonly<MovieListState>) {
+    if (prevState.inputSearchText !== this.state.inputSearchText) {
+      this.typeSearch();
+    }
+
     if (prevState.needToLoadMovies !== this.state.needToLoadMovies) {
       this.loadMovies();
     }
+
   }
 
   loadMovies = () => {
     if (this.state.needToLoadMovies) {
-      this.setState((prevState) => ({ ...prevState, needToLoadMovies: false }));
+      this.setState((prevState) => ({...prevState, needToLoadMovies: false}));
       if (!this.isloading) {
         this.setState((prevState) => ({
           ...prevState,
@@ -88,8 +93,8 @@ class MovieList extends React.Component<MovieListProps, MovieListState> {
 
         (async () => {
           try {
-            const moviePage = await getMovies(this.state.search);
-            this.setState((prevState) => ({ ...prevState, moviePage }));
+            const moviePage = await getMovies(this.state.inputSearchText);
+            this.setState((prevState) => ({...prevState, moviePage}));
           } catch (ex) {
             console.error('error fetching movies', ex);
             this.setState((prevState) => ({
@@ -98,7 +103,7 @@ class MovieList extends React.Component<MovieListProps, MovieListState> {
               error: ex,
             }));
           } finally {
-            this.setState((prevState) => ({ ...prevState, isLoading: false }));
+            this.setState((prevState) => ({...prevState, isLoading: false}));
             this.isloading = false;
           }
         })();
@@ -106,35 +111,40 @@ class MovieList extends React.Component<MovieListProps, MovieListState> {
     }
   };
 
-  typeSearch = (text: string) => {
-    _.debounce( () => this.setState(
-      prevState => ({
-        ...prevState, needToLoadMovies: true, search: text
-      })
+  typeSearch = () => {
+    _.debounce(() => this.setState(
+      {
+        needToLoadMovies: true,
+      }
     ), 350);
   }
 
   override render() {
-    const { moviePage, isLoading, isError, error } = this.state;
+    const {moviePage, isLoading, isError, error} = this.state;
 
     return (
       <div className={css.page}>
 
         <Input
-          value = {this.state.search}
-          onChange = {ev => this.typeSearch(ev.currentTarget.value)}
+          value={this.state.inputSearchText}
+          onChange={ev => this.setState(
+            {
+              inputSearchText: ev.currentTarget.value
+            }
+          )}
+          // this.typeSearch()
           placeholder="Type to search..."
         />
 
-        <button type="button" onClick={() => this.setState((prevState) => ({ ...prevState, needToLoadMovies: true }))}>
+        <button type="button" onClick={() => this.setState((prevState) => ({...prevState, needToLoadMovies: true}))}>
           reload list
         </button>
-        {isLoading && <Spin />}
+        {isLoading && <Spin/>}
         {isError &&
           (function () {
             if (['Failed to fetch', 'Network error'].includes(error.message))
-              return <Alert type="error" message="Ошибка соединения с сервером, возможно проблема с интернетом" />;
-            return <Alert type="error" message={`Неизвестная ошибка: ${error.message}`} />;
+              return <Alert type="error" message="Ошибка соединения с сервером, возможно проблема с интернетом"/>;
+            return <Alert type="error" message={`Неизвестная ошибка: ${error.message}`}/>;
           })()}
 
         <Flex className={css.cards} gap="middle" wrap="wrap">
@@ -146,7 +156,7 @@ class MovieList extends React.Component<MovieListProps, MovieListState> {
                 key={movie.id}
                 hoverable
                 style={cardStyle}
-                styles={{ body: { padding: 0, overflow: 'hidden' } }}
+                styles={{body: {padding: 0, overflow: 'hidden'}}}
               >
                 <Flex justify="space-between">
                   <img
@@ -159,7 +169,8 @@ class MovieList extends React.Component<MovieListProps, MovieListState> {
                     style={imgStyle}
                   />
 
-                  <Flex vertical align="flex-start" justify="space-between" style={{ padding: 20, paddingTop: 7, justifyContent: undefined }}>
+                  <Flex vertical align="flex-start" justify="space-between"
+                        style={{padding: 20, paddingTop: 7, justifyContent: undefined}}>
                     <div className={css.cardInfoTop}>
                       <h5 className={css.title}>{movie.title}</h5>
                       <div className={css.rating}>5</div>
