@@ -101,7 +101,7 @@ class MovieTab extends React.Component<MovieTabProps, MovieTabState> {
   );
 
   override render() {
-    const { moviePage, isLoading, isError, error } = this.state;
+    const { moviePage, isLoading, isError, error, inputSearchText } = this.state;
 
     return (
       <div className={css.page}>
@@ -134,12 +134,16 @@ class MovieTab extends React.Component<MovieTabProps, MovieTabState> {
                   return <MovieCard key={movie.id} movie={movie} />;
                 });
 
-
-              return  <Alert
-                message="Не найдено"
+              if (inputSearchText)
+              return <Alert
+                  message="Не найдено"
+                  description="Введите название фильма"
+                  type="info"
+                />
+              else return <Alert
                 description="Введите название фильма"
                 type="info"
-              />;
+              />
             }
           })()}
         </Flex>

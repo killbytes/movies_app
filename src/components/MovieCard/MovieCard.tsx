@@ -67,10 +67,7 @@ class MovieCard extends React.Component<MovieCardProps, MovieCardState> {
           >
             <div className={css.cardInfoTop}>
               <h5 className={css.title}>{movie.title}</h5>
-              <Flex gap="middle" vertical>
-                <Rate tooltips={desc} onChange={this.setValue} value={3} />
-                {/*{value ? <span>{desc[value - 1]}</span> : null}*/}
-              </Flex>
+
               <div className={css.rating}>5</div>
             </div>
             <time className={css.date}>2024</time>
@@ -79,6 +76,10 @@ class MovieCard extends React.Component<MovieCardProps, MovieCardState> {
               <div className={css.genre}>Drama</div>
             </div>
             <div className={css.descriprions}>{truncateText(movie.overview, 100)}</div>
+            <Flex gap="middle" vertical>
+              <Rate tooltips={desc} onChange={this.setValue} value={3} count={10} />
+              {/*{value ? <span>{desc[value - 1]}</span> : null}*/}
+            </Flex>
           </Flex>
         </Flex>
       </Card>
