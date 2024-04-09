@@ -4,6 +4,7 @@ import { Alert, Spin, Tabs } from 'antd';
 import { createGuestSession } from 'src/api/GetData';
 import MovieTab from 'src/components/MovieTab/MovieTab';
 import RatedTab from 'src/components/RatedTab/RatedTab';
+import css from './MoviePage.module.scss';
 
 export type MoviePageProps = object;
 export type MoviePageState = {
@@ -66,7 +67,7 @@ class MoviePage extends React.Component<MoviePageProps, MoviePageState> {
 
     return (
       <>
-        {isLoading && <Spin />}
+        {isLoading && <Spin className={css.spinLoading}/>}
         {isError &&
           (function () {
             if (['Failed to fetch', 'Network error'].includes(error.message))

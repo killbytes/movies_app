@@ -119,7 +119,7 @@ class MovieTab extends React.Component<MovieTabProps, MovieTabState> {
         <button type="button" onClick={() => this.setState((prevState) => ({ ...prevState, needToLoadMovies: true }))}>
           reload list
         </button>
-        {isLoading && <Spin />}
+        {isLoading && <Spin className={css.spinLoading} />}
         {isError &&
           (function () {
             if (['Failed to fetch', 'Network error'].includes(error.message))
@@ -134,7 +134,12 @@ class MovieTab extends React.Component<MovieTabProps, MovieTabState> {
                   return <MovieCard key={movie.id} movie={movie} />;
                 });
 
-              return 'Не найдено';
+
+              return  <Alert
+                message="Не найдено"
+                description="Введите название фильма"
+                type="info"
+              />;
             }
           })()}
         </Flex>

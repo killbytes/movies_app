@@ -1,6 +1,5 @@
 import React from 'react';
-import { Card, Flex } from 'antd';
-
+import { Card, Flex, Rate } from 'antd';
 import SkeletImg from 'src/assets/t6-k1xjf49Q.jpg';
 
 import css from './MovieCard.module.scss';
@@ -37,8 +36,11 @@ const truncateText = (text: string, maxLength: number) => {
   const truncatedText = text.substr(0, text.lastIndexOf(' ', maxLength));
   return `${truncatedText}...`;
 };
+const desc = ['terrible', 'bad', 'normal', 'good', 'wonderful'];
+
 
 class MovieCard extends React.Component<MovieCardProps, MovieCardState> {
+  private setValue: any;
   override render() {
     const { movie } = this.props;
 
@@ -65,6 +67,10 @@ class MovieCard extends React.Component<MovieCardProps, MovieCardState> {
           >
             <div className={css.cardInfoTop}>
               <h5 className={css.title}>{movie.title}</h5>
+              <Flex gap="middle" vertical>
+                <Rate tooltips={desc} onChange={this.setValue} value={3} />
+                {/*{value ? <span>{desc[value - 1]}</span> : null}*/}
+              </Flex>
               <div className={css.rating}>5</div>
             </div>
             <time className={css.date}>2024</time>
