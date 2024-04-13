@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, Flex, Rate } from 'antd';
 
 import SkeletImg from 'src/assets/t6-k1xjf49Q.jpg';
+import VoteAverage from 'src/components/MovieCard/VoteAverage';
 import { TGenre } from 'src/model/TGenre';
 import { TMovie } from 'src/model/TMovie';
 import { GenresContext } from 'src/pages/MoviePage/GenresContext';
@@ -68,7 +69,7 @@ class MovieCard extends React.Component<MovieCardProps, MovieCardState> {
             <div className={css.cardInfoTop}>
               <h5 className={css.title}>{movie.title}</h5>
 
-              <div className={css.rating}>5</div>
+              <VoteAverage value={movie.vote_average} />
             </div>
             <time className={css.date}>2024</time>
             <div className={css.genres}>
