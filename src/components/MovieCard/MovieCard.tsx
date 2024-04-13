@@ -23,7 +23,9 @@ const imgStyle: React.CSSProperties = {
 export type MovieCardProps = {
   movie: TMovie;
 };
-export type MovieCardState = object;
+export type MovieCardState = {
+  rating: number;
+};
 // search: string | null | Array<number|string>
 
 // Функция для сокращения текста
@@ -39,11 +41,19 @@ const desc = ['terrible', 'bad', 'normal', 'good', 'wonderful'];
 class MovieCard extends React.Component<MovieCardProps, MovieCardState> {
   static override contextType = GenresContext;
 
-  private setValue: any;
+  constructor(props: any) {
+    super(props);
+    this.state = {
+      rating: 0,
+    };
+  }
 
   override render() {
     const { movie } = this.props;
+    const { rating } = this.state;
     const genres = this.context as TGenre[];
+
+    console.log('rating', rating);
 
     return (
       <Card
@@ -84,8 +94,13 @@ class MovieCard extends React.Component<MovieCardProps, MovieCardState> {
             </div>
             <div className={css.descriprions}>{truncateText(movie.overview, 100)}</div>
             <Flex gap="middle" vertical>
-              <Rate tooltips={desc} onChange={this.setValue} value={3} count={10} />
-              {/*{value ? <span>{desc[value - 1]}</span> : null}*/}
+              <Rate
+                tooltips={desc}
+                onChange={(rating) => this.setState({ rating })}
+                value={rating}
+                count={10}
+                allowHalf
+              />
             </Flex>
           </Flex>
         </Flex>
