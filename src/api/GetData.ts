@@ -41,9 +41,9 @@ export async function getMovies(query: string, page: number) {
   const searchParams = new URLSearchParams({
     includeAdult: 'false',
     language: 'en-US',
-    query: query,
+    query,
     page: `${page}`,
-  })
+  });
   return getResource(`movie?${searchParams.toString()}`);
 }
 

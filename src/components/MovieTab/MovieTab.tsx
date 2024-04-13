@@ -20,13 +20,14 @@ export type MovieTabState = {
   isLoading: boolean;
   isError: boolean;
   error: any;
-  inputSearchText: string;
+  search: string;
+  isTyping: boolean;
   page: number;
 };
 // search: string | null | Array<number|string>
 
 class MovieTab extends React.Component<MovieTabProps, MovieTabState> {
-  isloading = false;
+  isLoading = false;
 
   constructor(props: any) {
     super(props);
@@ -36,7 +37,8 @@ class MovieTab extends React.Component<MovieTabProps, MovieTabState> {
       isLoading: false,
       isError: false,
       error: null,
-      inputSearchText: '',
+      search: '',
+      isTyping: false,
       page: 1,
     };
   }
@@ -46,7 +48,7 @@ class MovieTab extends React.Component<MovieTabProps, MovieTabState> {
   }
 
   override componentDidUpdate(prevProps: Readonly<MovieTabProps>, prevState: Readonly<MovieTabState>) {
-    if (prevState.inputSearchText !== this.state.inputSearchText) {
+    if (prevState.search !== this.state.search) {
       this.typeSearch();
     }
     if (prevState.page !== this.state.page) {
@@ -63,18 +65,18 @@ class MovieTab extends React.Component<MovieTabProps, MovieTabState> {
   loadMovies = () => {
     if (this.state.needToLoadMovies) {
       this.setState((prevState) => ({ ...prevState, needToLoadMovies: false }));
-      if (!this.isloading) {
+      if (!this.isLoading) {
         this.setState((prevState) => ({
           ...prevState,
           isLoading: true,
           isError: false,
           error: null,
         }));
-        this.isloading = true;
+        this.isLoading = true;
 
         (async () => {
           try {
-            const moviePage = await getMovies(this.state.inputSearchText, this.state.page);
+            const moviePage = await getMovies(this.state.search, this.state.page);
             this.setState((prevState) => ({ ...prevState, moviePage }));
           } catch (ex) {
             console.error('error fetching movies', ex);
@@ -85,7 +87,7 @@ class MovieTab extends React.Component<MovieTabProps, MovieTabState> {
             }));
           } finally {
             this.setState((prevState) => ({ ...prevState, isLoading: false }));
-            this.isloading = false;
+            this.isLoading = false;
           }
         })();
       }
@@ -96,20 +98,22 @@ class MovieTab extends React.Component<MovieTabProps, MovieTabState> {
     () =>
       this.setState({
         needToLoadMovies: true,
+        isTyping: false,
       }),
     350
   );
 
   override render() {
-    const { moviePage, isLoading, isError, error, inputSearchText } = this.state;
+    const { moviePage, isLoading, isError, error, search, isTyping } = this.state;
 
     return (
       <div className={css.page}>
         <Input
-          value={this.state.inputSearchText}
+          value={this.state.search}
           onChange={(ev) =>
             this.setState({
-              inputSearchText: ev.currentTarget.value,
+              search: ev.currentTarget.value,
+              isTyping: true,
             })
           }
           // this.typeSearch()
@@ -119,7 +123,7 @@ class MovieTab extends React.Component<MovieTabProps, MovieTabState> {
         <button type="button" onClick={() => this.setState((prevState) => ({ ...prevState, needToLoadMovies: true }))}>
           reload list
         </button>
-        {isLoading && <Spin className={css.spinLoading} />}
+        {(isLoading || isTyping) && <Spin className={css.spinLoading} />}
         {isError &&
           (function () {
             if (['Failed to fetch', 'Network error'].includes(error.message))
@@ -128,30 +132,26 @@ class MovieTab extends React.Component<MovieTabProps, MovieTabState> {
           })()}
         <Flex className={css.cards} gap="middle" wrap="wrap">
           {(function () {
-            if (moviePage && !isLoading) {
-              if (moviePage.total_results)
-                return moviePage.results.map((movie) => {
-                  return <MovieCard key={movie.id} movie={movie} />;
-                });
-
-              if (inputSearchText)
-              return <Alert
-                  message="Не найдено"
-                  description="Введите название фильма"
-                  type="info"
-                />
-              else return <Alert
-                description="Введите название фильма"
-                type="info"
-              />
+            if (!isTyping && !isLoading) {
+              if (moviePage) {
+                if (!moviePage.total_results && !search) return <Alert message="Введите название фильма" type="info" />;
+                if (!moviePage.total_results) return <Alert message="Не найдено" type="info" />;
+                else
+                  return moviePage.results.map((movie) => {
+                    return <MovieCard key={movie.id} movie={movie} />;
+                  });
+              } else {
+                if (!search) return <Alert message="Введите название фильма" type="info" />;
+              }
             }
+            return undefined;
           })()}
         </Flex>
-        {this.state.moviePage && (
+        {moviePage && (
           <Pagination
             current={this.state.page}
             pageSize={20}
-            total={this.state.moviePage.total_results}
+            total={moviePage.total_results}
             onChange={(page: number) => this.setState({ page })}
           />
         )}

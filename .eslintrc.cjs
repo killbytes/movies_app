@@ -70,6 +70,8 @@ module.exports = {
     'react/prefer-stateless-function': 'off',
     'spaced-comment': 'off',
     'no-void': 'off',
+    'no-lonely-if': 'off',
+    'no-else-return': 'off',
     'vite': 'off',
     // disable semicolons - set it in prettier
     //'semi': 'off',
