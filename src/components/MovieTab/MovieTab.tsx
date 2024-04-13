@@ -2,8 +2,9 @@ import React from 'react';
 import { Alert, Flex, Input, Pagination, Spin } from 'antd';
 import _ from 'lodash';
 
-import { getMovies } from 'src/api/GetData';
-import MovieCard, { TMovie } from 'src/components/MovieCard/MovieCard';
+import { getMovies } from 'src/api/MoviesApi';
+import MovieCard from 'src/components/MovieCard/MovieCard';
+import { TMovie } from 'src/model/TMovie';
 
 import css from './MovieTab.module.scss';
 

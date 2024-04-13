@@ -1,6 +1,10 @@
 import React from 'react';
 import { Card, Flex, Rate } from 'antd';
+
 import SkeletImg from 'src/assets/t6-k1xjf49Q.jpg';
+import { TGenre } from 'src/model/TGenre';
+import { TMovie } from 'src/model/TMovie';
+import { GenresContext } from 'src/pages/MoviePage/GenresContext';
 
 import css from './MovieCard.module.scss';
 
@@ -13,13 +17,6 @@ const imgStyle: React.CSSProperties = {
   display: 'flex',
   width: 180,
   height: 280,
-};
-
-export type TMovie = {
-  id: number;
-  poster_path: string;
-  title: string;
-  overview: string;
 };
 
 export type MovieCardProps = {
@@ -38,11 +35,14 @@ const truncateText = (text: string, maxLength: number) => {
 };
 const desc = ['terrible', 'bad', 'normal', 'good', 'wonderful'];
 
-
 class MovieCard extends React.Component<MovieCardProps, MovieCardState> {
+  static override contextType = GenresContext;
+
   private setValue: any;
+
   override render() {
     const { movie } = this.props;
+    const genres = this.context as TGenre[];
 
     return (
       <Card
@@ -72,8 +72,14 @@ class MovieCard extends React.Component<MovieCardProps, MovieCardState> {
             </div>
             <time className={css.date}>2024</time>
             <div className={css.genres}>
-              <div className={css.genre}>Action</div>
-              <div className={css.genre}>Drama</div>
+              {movie.genre_ids.map((gId) => {
+                const genre = genres.find((g) => g.id === gId);
+                return (
+                  <div key={gId} className={css.genre}>
+                    {genre ? genre.name : 'Неизвестный жанр'}
+                  </div>
+                );
+              })}
             </div>
             <div className={css.descriprions}>{truncateText(movie.overview, 100)}</div>
             <Flex gap="middle" vertical>

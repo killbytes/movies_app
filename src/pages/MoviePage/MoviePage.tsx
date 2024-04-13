@@ -1,10 +1,13 @@
 import React from 'react';
 import { Alert, Spin, Tabs } from 'antd';
 
-import { createGuestSession } from 'src/api/GetData';
+import { createGuestSession, getGenres } from 'src/api/MoviesApi';
 import MovieTab from 'src/components/MovieTab/MovieTab';
 import RatedTab from 'src/components/RatedTab/RatedTab';
+import { TGenre } from 'src/model/TGenre';
+
 import css from './MoviePage.module.scss';
+import { GenresContext } from './GenresContext';
 
 export type MoviePageProps = object;
 export type MoviePageState = {
@@ -12,6 +15,7 @@ export type MoviePageState = {
   isError: boolean;
   error: any;
   isInited: boolean;
+  genres: TGenre[];
 };
 
 // search: string | null | Array<number|string>
@@ -26,14 +30,15 @@ class MoviePage extends React.Component<MoviePageProps, MoviePageState> {
       isError: false,
       error: null,
       isInited: false,
+      genres: [],
     };
   }
 
   override componentDidMount() {
-    this.createSession();
+    this.initMoviesApp();
   }
 
-  createSession = () => {
+  initMoviesApp = () => {
     if (!this.isloading) {
       this.setState({
         isLoading: true,
@@ -44,18 +49,19 @@ class MoviePage extends React.Component<MoviePageProps, MoviePageState> {
 
       (async () => {
         try {
-          await createGuestSession();
+          const [, genres] = await Promise.all([await createGuestSession(), await getGenres()]);
           this.setState({
             isInited: true,
+            genres,
           });
         } catch (ex) {
-          console.error('error fetching movies', ex);
+          console.error('error creating session or fetching genres', ex);
           this.setState({
             isError: true,
             error: ex,
           });
         } finally {
-          this.setState((prevState) => ({ ...prevState, isLoading: false }));
+          this.setState({ isLoading: false });
           this.isloading = false;
         }
       })();
@@ -63,11 +69,11 @@ class MoviePage extends React.Component<MoviePageProps, MoviePageState> {
   };
 
   override render() {
-    const { isLoading, isError, error, isInited } = this.state;
+    const { isLoading, isError, error, isInited, genres } = this.state;
 
     return (
       <>
-        {isLoading && <Spin className={css.spinLoading}/>}
+        {isLoading && <Spin className={css.spinLoading} />}
         {isError &&
           (function () {
             if (['Failed to fetch', 'Network error'].includes(error.message))
@@ -75,22 +81,24 @@ class MoviePage extends React.Component<MoviePageProps, MoviePageState> {
             return <Alert type="error" message={`Неизвестная ошибка: ${error.message}`} />;
           })()}
         {isInited && (
-          <Tabs
-            defaultActiveKey="1"
-            centered
-            items={[
-              {
-                key: 'Search',
-                label: `Search`,
-                children: <MovieTab />,
-              },
-              {
-                key: 'Rated',
-                label: `Rated`,
-                children: <RatedTab />,
-              },
-            ]}
-          />
+          <GenresContext.Provider value={genres}>
+            <Tabs
+              defaultActiveKey="1"
+              centered
+              items={[
+                {
+                  key: 'Search',
+                  label: `Search`,
+                  children: <MovieTab />,
+                },
+                {
+                  key: 'Rated',
+                  label: `Rated`,
+                  children: <RatedTab />,
+                },
+              ]}
+            />
+          </GenresContext.Provider>
         )}
       </>
     );
