@@ -74,6 +74,8 @@ module.exports = {
     'no-else-return': 'off',
     'react/static-property-placement': 'off',
     'import/prefer-default-export': 'off',
+    'react/no-unused-state': 'off',
+    'max-classes-per-file': 'off',
     'vite': 'off',
     // disable semicolons - set it in prettier
     //'semi': 'off',

@@ -5,9 +5,11 @@ import { createGuestSession, getGenres } from 'src/api/MoviesApi';
 import MovieTab from 'src/components/MovieTab/MovieTab';
 import RatedTab from 'src/components/RatedTab/RatedTab';
 import { TGenre } from 'src/model/TGenre';
+import { GuestSessionIdContext } from 'src/pages/MoviePage/GuestSessionIdContext';
 
 import css from './MoviePage.module.scss';
 import { GenresContext } from './GenresContext';
+import { MovieRatingContext } from './MovieRatingContext';
 
 export type MoviePageProps = object;
 export type MoviePageState = {
@@ -15,7 +17,12 @@ export type MoviePageState = {
   isError: boolean;
   error: any;
   isInited: boolean;
+  guestSessionId: string;
   genres: TGenre[];
+  movieRating: {
+    rating: Map<number, number>;
+    setRating: (setRating: (ratingMap: Map<number, number>) => void) => void;
+  };
 };
 
 // search: string | null | Array<number|string>
@@ -30,7 +37,19 @@ class MoviePage extends React.Component<MoviePageProps, MoviePageState> {
       isError: false,
       error: null,
       isInited: false,
+      guestSessionId: '',
       genres: [],
+      movieRating: {
+        rating: new Map<number, number>(),
+        setRating: (setRating: (ratingMap: Map<number, number>) => void) =>
+          this.setState((prevState) => ({
+            ...prevState,
+            movieRating: (function () {
+              setRating(prevState.movieRating.rating);
+              return { ...prevState.movieRating };
+            })(),
+          })),
+      },
     };
   }
 
@@ -49,9 +68,10 @@ class MoviePage extends React.Component<MoviePageProps, MoviePageState> {
 
       (async () => {
         try {
-          const [, genres] = await Promise.all([await createGuestSession(), await getGenres()]);
+          const [guestSessionId, genres] = await Promise.all([await createGuestSession(), await getGenres()]);
           this.setState({
             isInited: true,
+            guestSessionId,
             genres,
           });
         } catch (ex) {
@@ -69,7 +89,7 @@ class MoviePage extends React.Component<MoviePageProps, MoviePageState> {
   };
 
   override render() {
-    const { isLoading, isError, error, isInited, genres } = this.state;
+    const { isLoading, isError, error, isInited, guestSessionId, genres, movieRating } = this.state;
 
     return (
       <>
@@ -82,22 +102,26 @@ class MoviePage extends React.Component<MoviePageProps, MoviePageState> {
           })()}
         {isInited && (
           <GenresContext.Provider value={genres}>
-            <Tabs
-              defaultActiveKey="1"
-              centered
-              items={[
-                {
-                  key: 'Search',
-                  label: `Search`,
-                  children: <MovieTab />,
-                },
-                {
-                  key: 'Rated',
-                  label: `Rated`,
-                  children: <RatedTab />,
-                },
-              ]}
-            />
+            <MovieRatingContext.Provider value={movieRating}>
+              <GuestSessionIdContext.Provider value={guestSessionId}>
+                <Tabs
+                  defaultActiveKey="1"
+                  centered
+                  items={[
+                    {
+                      key: 'Search',
+                      label: `Search`,
+                      children: <MovieTab />,
+                    },
+                    {
+                      key: 'Rated',
+                      label: `Rated`,
+                      children: <RatedTab />,
+                    },
+                  ]}
+                />
+              </GuestSessionIdContext.Provider>
+            </MovieRatingContext.Provider>
           </GenresContext.Provider>
         )}
       </>

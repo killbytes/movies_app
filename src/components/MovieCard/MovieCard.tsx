@@ -1,11 +1,13 @@
 import React from 'react';
 import { Card, Flex, Rate } from 'antd';
 
+import { addRating, deleteRating } from 'src/api/MoviesApi';
 import SkeletImg from 'src/assets/t6-k1xjf49Q.jpg';
 import VoteAverage from 'src/components/MovieCard/VoteAverage';
-import { TGenre } from 'src/model/TGenre';
 import { TMovie } from 'src/model/TMovie';
 import { GenresContext } from 'src/pages/MoviePage/GenresContext';
+import { GuestSessionIdContext } from 'src/pages/MoviePage/GuestSessionIdContext';
+import { MovieRatingContext } from 'src/pages/MoviePage/MovieRatingContext';
 
 import css from './MovieCard.module.scss';
 
@@ -36,10 +38,9 @@ const truncateText = (text: string, maxLength: number) => {
   const truncatedText = text.substr(0, text.lastIndexOf(' ', maxLength));
   return `${truncatedText}...`;
 };
-const desc = ['terrible', 'bad', 'normal', 'good', 'wonderful'];
 
 class MovieCard extends React.Component<MovieCardProps, MovieCardState> {
-  static override contextType = GenresContext;
+  //static override contextType = MovieRatingContext;
 
   constructor(props: any) {
     super(props);
@@ -50,61 +51,80 @@ class MovieCard extends React.Component<MovieCardProps, MovieCardState> {
 
   override render() {
     const { movie } = this.props;
-    const { rating } = this.state;
-    const genres = this.context as TGenre[];
-
-    console.log('rating', rating);
 
     return (
-      <Card
-        size="small"
-        key={movie.id}
-        hoverable
-        style={cardStyle}
-        styles={{ body: { padding: 0, overflow: 'hidden' } }}
-      >
-        <Flex justify="space-between">
-          <img
-            alt="avatar"
-            src={movie.poster_path ? `https://image.tmdb.org/t/p/original${movie.poster_path}` : SkeletImg}
-            style={imgStyle}
-          />
+      <GenresContext.Consumer>
+        {(genres) => (
+          <MovieRatingContext.Consumer>
+            {({ rating, setRating }) => (
+              <GuestSessionIdContext.Consumer>
+                {(guestSessionId) => (
+                  <Card
+                    size="small"
+                    key={movie.id}
+                    hoverable
+                    style={cardStyle}
+                    styles={{ body: { padding: 0, overflow: 'hidden' } }}
+                  >
+                    <Flex justify="space-between">
+                      <img
+                        alt="avatar"
+                        src={movie.poster_path ? `https://image.tmdb.org/t/p/original${movie.poster_path}` : SkeletImg}
+                        style={imgStyle}
+                      />
 
-          <Flex
-            vertical
-            align="flex-start"
-            justify="space-between"
-            style={{ padding: 20, paddingTop: 7, justifyContent: undefined }}
-          >
-            <div className={css.cardInfoTop}>
-              <h5 className={css.title}>{movie.title}</h5>
+                      <Flex
+                        vertical
+                        align="flex-start"
+                        justify="space-between"
+                        style={{ padding: 20, paddingTop: 7, justifyContent: undefined }}
+                      >
+                        <div className={css.cardInfoTop}>
+                          <h5 className={css.title}>{movie.title}</h5>
 
-              <VoteAverage value={movie.vote_average} />
-            </div>
-            <time className={css.date}>2024</time>
-            <div className={css.genres}>
-              {movie.genre_ids.map((gId) => {
-                const genre = genres.find((g) => g.id === gId);
-                return (
-                  <div key={gId} className={css.genre}>
-                    {genre ? genre.name : 'Неизвестный жанр'}
-                  </div>
-                );
-              })}
-            </div>
-            <div className={css.descriprions}>{truncateText(movie.overview, 100)}</div>
-            <Flex gap="middle" vertical>
-              <Rate
-                tooltips={desc}
-                onChange={(rating) => this.setState({ rating })}
-                value={rating}
-                count={10}
-                allowHalf
-              />
-            </Flex>
-          </Flex>
-        </Flex>
-      </Card>
+                          <VoteAverage value={movie.vote_average} />
+                        </div>
+                        <time className={css.date}>2024</time>
+                        <div className={css.genres}>
+                          {movie.genre_ids.map((gId) => {
+                            const genre = genres.find((g) => g.id === gId);
+                            return (
+                              <div key={gId} className={css.genre}>
+                                {genre ? genre.name : 'Неизвестный жанр'}
+                              </div>
+                            );
+                          })}
+                        </div>
+                        <div className={css.descriprions}>{truncateText(movie.overview, 100)}</div>
+                        <Flex gap="middle" vertical>
+                          <Rate
+                            onChange={(rating) => {
+                              setRating((prev) => prev.set(movie.id, rating));
+
+                              (async () => {
+                                if (rating > 0) {
+                                  await addRating(movie.id, guestSessionId, rating);
+                                  setRating((prev) => prev.set(movie.id, rating));
+                                } else {
+                                  await deleteRating(movie.id, guestSessionId);
+                                  setRating((prev) => prev.set(movie.id, rating));
+                                }
+                              })();
+                            }}
+                            value={rating.get(movie.id) ?? 0}
+                            count={10}
+                            allowHalf
+                          />
+                        </Flex>
+                      </Flex>
+                    </Flex>
+                  </Card>
+                )}
+              </GuestSessionIdContext.Consumer>
+            )}
+          </MovieRatingContext.Consumer>
+        )}
+      </GenresContext.Consumer>
     );
   }
 }
