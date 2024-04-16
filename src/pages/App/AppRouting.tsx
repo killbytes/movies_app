@@ -1,7 +1,7 @@
 import { createBrowserRouter, Navigate, RouteObject, RouterProvider } from 'react-router-dom';
 
-import MovieList from 'src/MovieList/MovieList';
-import Planet from 'src/Planet/Planet';
+import Planet from 'src/pages/Planet/Planet';
+import MoviePage from 'src/pages/MoviePage/MoviePage';
 
 const rootRoutes: RouteObject[] = [
   {
@@ -10,7 +10,7 @@ const rootRoutes: RouteObject[] = [
   },
   {
     path: 'movies',
-    Component: MovieList as any,
+    Component: MoviePage as any,
   },
   {
     path: '*',
