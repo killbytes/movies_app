@@ -108,7 +108,7 @@ class MovieList extends React.Component<MovieListProps, MovieListState> {
 
     return (
       <div className={css.page}>
-        <button type="button" onClick={() => this.setState((prevState) => ({ ...prevState, needToLoadMovies: true }))}>
+        <button type="button" style={{"display": "none"}} onClick={() => this.setState((prevState) => ({ ...prevState, needToLoadMovies: true }))}>
           reload list
         </button>
         {isLoading && <Spin />}
