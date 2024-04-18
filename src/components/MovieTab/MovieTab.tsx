@@ -121,7 +121,11 @@ class MovieTab extends React.Component<MovieTabProps, MovieTabState> {
           placeholder="Type to search..."
         />
 
-        <button type="button" style={{"display": "none"}} onClick={() => this.setState((prevState) => ({ ...prevState, needToLoadMovies: true }))}>
+        <button
+          type="button"
+          style={{ display: 'none' }}
+          onClick={() => this.setState((prevState) => ({ ...prevState, needToLoadMovies: true }))}
+        >
           reload list
         </button>
         {(isLoading || isTyping) && <Spin className={css.spinLoading} />}

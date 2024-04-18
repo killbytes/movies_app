@@ -12,7 +12,7 @@ import { MovieRatingContext } from 'src/pages/MoviePage/MovieRatingContext';
 import css from './MovieCard.module.scss';
 
 const cardStyle: React.CSSProperties = {
-  "max-width": 450,
+  maxWidth: 450,
   borderRadius: 8,
 };
 
