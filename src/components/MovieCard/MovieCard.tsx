@@ -12,7 +12,7 @@ import { MovieRatingContext } from 'src/pages/MoviePage/MovieRatingContext';
 import css from './MovieCard.module.scss';
 
 const cardStyle: React.CSSProperties = {
-  width: 450,
+  "max-width": 450,
   borderRadius: 8,
 };
 
@@ -98,6 +98,7 @@ class MovieCard extends React.Component<MovieCardProps, MovieCardState> {
                         <div className={css.descriprions}>{truncateText(movie.overview, 100)}</div>
                         <Flex gap="middle" vertical>
                           <Rate
+                            className={css.rate}
                             onChange={(rating) => {
                               setRating((prev) => prev.set(movie.id, rating));
 
@@ -114,6 +115,7 @@ class MovieCard extends React.Component<MovieCardProps, MovieCardState> {
                             value={rating.get(movie.id) ?? 0}
                             count={10}
                             allowHalf
+                            style={{ fontSize: 18 }}
                           />
                         </Flex>
                       </Flex>
