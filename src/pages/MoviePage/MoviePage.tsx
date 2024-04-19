@@ -23,6 +23,7 @@ export type MoviePageState = {
     rating: Map<number, number>;
     setRating: (setRating: (ratingMap: Map<number, number>) => void) => void;
   };
+  tabKey: string;
 };
 
 // search: string | null | Array<number|string>
@@ -50,6 +51,7 @@ class MoviePage extends React.Component<MoviePageProps, MoviePageState> {
             })(),
           })),
       },
+      tabKey: 'Search',
     };
   }
 
@@ -89,7 +91,7 @@ class MoviePage extends React.Component<MoviePageProps, MoviePageState> {
   };
 
   override render() {
-    const { isLoading, isError, error, isInited, guestSessionId, genres, movieRating } = this.state;
+    const { isLoading, isError, error, isInited, guestSessionId, genres, movieRating, tabKey } = this.state;
 
     return (
       <>
@@ -105,7 +107,8 @@ class MoviePage extends React.Component<MoviePageProps, MoviePageState> {
             <MovieRatingContext.Provider value={movieRating}>
               <GuestSessionIdContext.Provider value={guestSessionId}>
                 <Tabs
-                  defaultActiveKey="1"
+                  activeKey={tabKey}
+                  onChange={(activeKey) => this.setState({ tabKey: activeKey })}
                   centered
                   items={[
                     {
@@ -116,7 +119,7 @@ class MoviePage extends React.Component<MoviePageProps, MoviePageState> {
                     {
                       key: 'Rated',
                       label: `Rated`,
-                      children: <RatedTab />,
+                      children: <RatedTab isTabSelected={tabKey === 'Rated'} />,
                     },
                   ]}
                 />

@@ -5,22 +5,8 @@ import { getRatedMovies } from 'src/api/MoviesApi';
 import MovieCard from 'src/components/MovieCard/MovieCard';
 import { TMovie } from 'src/model/TMovie';
 import { GuestSessionIdContext } from 'src/pages/MoviePage/GuestSessionIdContext';
-import { MovieRatingContext } from 'src/pages/MoviePage/MovieRatingContext';
 
 import css from './RatedTab.module.scss';
-
-class TriggerRerenderWhenContextChanged extends React.PureComponent<{ triggerLoadMovies: () => void }, object> {
-  override render() {
-    return (
-      <MovieRatingContext.Consumer>
-        {() => {
-          setTimeout(() => this.props.triggerLoadMovies(), 1000);
-          return undefined;
-        }}
-      </MovieRatingContext.Consumer>
-    );
-  }
-}
 
 export type TMoviePage = {
   page: number;
@@ -28,7 +14,9 @@ export type TMoviePage = {
   total_results: number;
 };
 
-export type RatedTabProps = object;
+export type RatedTabProps = {
+  isTabSelected: boolean;
+};
 export type RatedTabState = {
   moviePage: null | TMoviePage;
   needToLoadMovies: boolean;
@@ -62,9 +50,10 @@ class RatedTab extends React.Component<RatedTabProps, RatedTabState> {
 
   override componentDidUpdate(prevProps: Readonly<RatedTabProps>, prevState: Readonly<RatedTabState>) {
     if (prevState.page !== this.state.page) {
-      this.setState({
-        needToLoadMovies: true,
-      });
+      this.setState({ needToLoadMovies: true });
+    }
+    if (prevProps.isTabSelected !== this.props.isTabSelected && this.props.isTabSelected) {
+      this.setState({ needToLoadMovies: true });
     }
 
     if (prevState.needToLoadMovies !== this.state.needToLoadMovies) {
@@ -84,10 +73,12 @@ class RatedTab extends React.Component<RatedTabProps, RatedTabState> {
         }));
         this.isLoading = true;
 
+        const { page } = this.state;
+        const sessionId = this.context as string;
         (async () => {
           try {
-            const moviePage = await getRatedMovies(this.context as string, this.state.page);
-            this.setState((prevState) => ({ ...prevState, moviePage }));
+            const moviePage = await getRatedMovies(sessionId, page);
+            this.setState({ moviePage });
           } catch (ex) {
             console.error('error fetching movies', ex);
             this.setState((prevState) => ({
@@ -103,8 +94,6 @@ class RatedTab extends React.Component<RatedTabProps, RatedTabState> {
       }
     }
   };
-
-  triggerLoadMovies = () => this.setState({ needToLoadMovies: true })
 
   override render() {
     const { moviePage, isLoading, isError, error } = this.state;
@@ -132,7 +121,7 @@ class RatedTab extends React.Component<RatedTabProps, RatedTabState> {
             return undefined;
           })()}
         </Flex>
-        {moviePage && (
+        {moviePage && moviePage.total_results > 20 && (
           <Pagination
             current={this.state.page}
             pageSize={20}
@@ -140,7 +129,7 @@ class RatedTab extends React.Component<RatedTabProps, RatedTabState> {
             onChange={(page: number) => this.setState({ page })}
           />
         )}
-        <TriggerRerenderWhenContextChanged triggerLoadMovies={this.triggerLoadMovies} />
+        {/* <TriggerRerenderWhenContextChanged triggerLoadMovies={this.triggerLoadMovies} /> */}
       </div>
     );
   }

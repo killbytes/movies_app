@@ -1,4 +1,5 @@
 export type TMovie = {
+  release_date: any;
   id: number;
   poster_path: string;
   title: string;
