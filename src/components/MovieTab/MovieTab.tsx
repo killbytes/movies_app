@@ -151,14 +151,18 @@ class MovieTab extends React.Component<MovieTabProps, MovieTabState> {
             }
             return undefined;
           })()}
+
+
         </Flex>
-        {moviePage && (
-          <Pagination
-            current={this.state.page}
-            pageSize={20}
-            total={moviePage.total_results}
-            onChange={(page: number) => this.setState({ page })}
-          />
+        {Boolean(moviePage?.total_results) && (
+          <div className={css.pagination}>
+            <Pagination
+              current={this.state.page}
+              pageSize={20}
+              total={moviePage?.total_results}
+              onChange={(page: number) => this.setState({ page })}
+            />
+          </div>
         )}
       </div>
     );

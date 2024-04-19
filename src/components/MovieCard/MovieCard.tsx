@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, Flex, Rate } from 'antd';
 
 import { addRating, deleteRating } from 'src/api/MoviesApi';
+import { format, parseISO } from 'date-fns';
 import SkeletImg from 'src/assets/t6-k1xjf49Q.jpg';
 import VoteAverage from 'src/components/MovieCard/VoteAverage';
 import { TMovie } from 'src/model/TMovie';
@@ -52,6 +53,9 @@ class MovieCard extends React.Component<MovieCardProps, MovieCardState> {
   override render() {
     const { movie } = this.props;
 
+    const originalDate = parseISO(movie.release_date);
+    const formattedDate = format(originalDate, 'MMMM d, yyyy');
+
     return (
       <GenresContext.Consumer>
         {(genres) => (
@@ -72,7 +76,6 @@ class MovieCard extends React.Component<MovieCardProps, MovieCardState> {
                         src={movie.poster_path ? `https://image.tmdb.org/t/p/original${movie.poster_path}` : SkeletImg}
                         style={imgStyle}
                       />
-
                       <Flex
                         vertical
                         align="flex-start"
@@ -81,10 +84,9 @@ class MovieCard extends React.Component<MovieCardProps, MovieCardState> {
                       >
                         <div className={css.cardInfoTop}>
                           <h5 className={css.title}>{movie.title}</h5>
-
                           <VoteAverage value={movie.vote_average} />
                         </div>
-                        <time className={css.date}>2024</time>
+                        <time className={css.date}>{formattedDate}</time>
                         <div className={css.genres}>
                           {movie.genre_ids.map((gId) => {
                             const genre = genres.find((g) => g.id === gId);
