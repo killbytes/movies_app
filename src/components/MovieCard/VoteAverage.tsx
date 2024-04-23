@@ -1,10 +1,12 @@
 import React from 'react';
+import css from './MovieCard.module.scss';
 
 class VoteAverage extends React.PureComponent<{ value: number }, object> {
   override render() {
     const { value } = this.props;
     return (
       <div
+        className={css.ratingArrow}
         style={{
           width: 40,
           height: 40,

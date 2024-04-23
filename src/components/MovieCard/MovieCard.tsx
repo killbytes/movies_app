@@ -17,11 +17,12 @@ const cardStyle: React.CSSProperties = {
   borderRadius: 8,
 };
 
-const imgStyle: React.CSSProperties = {
-  display: 'flex',
-  width: 180,
-  height: 280,
-};
+const imgStyle: React.CSSProperties = {}
+// const imgStyle: React.CSSProperties = {
+//   display: 'flex',
+//   width: 180,
+//   height: 280
+// };
 
 export type MovieCardProps = {
   movie: TMovie;
@@ -63,6 +64,7 @@ class MovieCard extends React.Component<MovieCardProps, MovieCardState> {
               <GuestSessionIdContext.Consumer>
                 {(guestSessionId) => (
                   <Card
+                    className = {css.card}
                     size="small"
                     key={movie.id}
                     hoverable
@@ -71,15 +73,17 @@ class MovieCard extends React.Component<MovieCardProps, MovieCardState> {
                   >
                     <Flex justify="space-between">
                       <img
+                        className={css.img}
                         alt="avatar"
                         src={movie.poster_path ? `https://image.tmdb.org/t/p/original${movie.poster_path}` : SkeletImg}
-                        style={imgStyle}
+                        style={{...imgStyle}}
                       />
                       <Flex
+                        className={css.contentRight}
                         vertical
                         align="flex-start"
                         justify="space-between"
-                        style={{ padding: 20, paddingTop: 7, justifyContent: undefined }}
+                        // style={{ padding: 20, paddingTop: 7, justifyContent: undefined }}
                       >
                         <div className={css.cardInfoTop}>
                           <h5 className={css.title}>{movie.title}</h5>
@@ -96,8 +100,8 @@ class MovieCard extends React.Component<MovieCardProps, MovieCardState> {
                             );
                           })}
                         </div>
-                        <div className={css.descriprions}>{truncateText(movie.overview, 100)}</div>
-                        <Flex gap="middle" vertical>
+                        <div className={css.descriptions}>{truncateText(movie.overview, 100)}</div>
+                        <Flex gap="middle" vertical className={css.rateFlex}>
                           <Rate
                             className={css.rate}
                             onChange={(rating) => {
