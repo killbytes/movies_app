@@ -54,7 +54,7 @@ class MovieCard extends React.Component<MovieCardProps, MovieCardState> {
     const { movie } = this.props;
 
     const originalDate = parseISO(movie.release_date);
-    const formattedDate = format(originalDate, 'MMMM d, yyyy');
+    const formattedDate = movie.release_date ? format(originalDate, 'MMMM d, yyyy') : '';
 
     return (
       <GenresContext.Consumer>
